@@ -1,0 +1,70 @@
+###############################################################
+#第一个数据库,筛选的数据,当destinationdb=d1时往tcp数据库mqtt_consumer表里写数据
+[[outputs.influxdb]]
+#定义数据库地址和端口号
+urls = [ "http://127.0.0.1:8086" ]
+#数据库名称
+database = "tcp"
+[outputs.influxdb.tagdrop]
+  name = ["*"]
+precision = "s"
+retention_policy = ""
+write_consistency = "any"
+timeout = "5s"
+#筛选的条件destinationdb=d1
+[outputs.influxdb.tagpass]
+destinationdb = ["d1"] 
+
+#第二个数据库
+[[outputs.influxdb]]
+urls = [ "http://127.0.0.1:8086" ]
+database = "udp"
+[outputs.influxdb.tagdrop]
+  name = ["*"]
+precision = "s"
+retention_policy = ""
+write_consistency = "any"
+timeout = "5s"
+[outputs.influxdb.tagpass]
+destinationdb = ["d2"]  
+
+
+########################################################################
+#定阅的第一个mqtt服务器
+[[inputs.mqtt_consumer]]
+
+servers = ["tcp://127.0.0.1:1883"]
+qos = 2
+topics = [
+"metrics1","metrics3"
+]
+persistent_session = false
+client_id = ""
+#username = "telegraf" password = "metricsmetricsmetricsmetrics"
+insecure_skip_verify = true
+data_format = "json"    # 如果它没有会报:Error in plugin: metric parse error: expected field at 1:23
+tag_keys = [            
+  "destinationdb"
+  ]
+###[inputs.mqtt_consumer.tags]
+     ###destinationdb = "d1"
+
+################################################
+##多个服务器需要写下面
+[[inputs.mqtt_consumer]]
+
+servers = ["tcp://127.0.0.1:1883"]
+qos = 2
+topics = [
+"metrics2"
+]
+persistent_session = false
+client_id = ""
+#username = "telegraf" password = "metricsmetricsmetricsmetrics"
+insecure_skip_verify = true
+data_format = "json"
+ tag_keys = [
+   "destinationdb"
+ ]
+###[inputs.mqtt_consumer.tags]
+     ###destinationdb = "d1"
