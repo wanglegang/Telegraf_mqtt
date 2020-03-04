@@ -1,0 +1,3 @@
+主题:  metrics1
+消息:  {"destinationdb":"d2","tagexclude": 1,"two": 2, "three": 33 }
+服务器地址:tcp://www.uo*.cn:1883  
